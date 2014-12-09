@@ -1,5 +1,5 @@
-#ifndef _db_h
-#define _db_h
+#ifndef __PUSHOVER_H__
+#define __PUSHOVER_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,4 +19,4 @@ int pushover_send(
         bool verbose
 );
 
-#endif
+#endif /*__PUSHOVER_H__*/
