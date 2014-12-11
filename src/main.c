@@ -1,12 +1,10 @@
 #include <argp.h>
 #include "pushover.h"
 
-const char *argp_program_version = "pushoverc 1.0";
+const char *argp_program_version     = "pushoverc 1.0";
 const char *argp_program_bug_address = "<rubiojr@frameos.org>";
-
-static char doc[] = "pushoverc -- tiny Pushover client";
-
-static char args_doc[] = "message";
+static char doc[]                    = "pushoverc -- tiny Pushover client";
+static char args_doc[]               = "message";
 
 /* The options we understand. */
 static struct argp_option options[] = {
@@ -81,14 +79,10 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 
 int main (int argc, char **argv)
 {
-	struct arguments arguments;
 	const char *env_token;
 	const char *env_user;
-
-	arguments.verbose = 0;
-	arguments.user = NULL;
-	arguments.key = NULL;
-	arguments.title = NULL;
+	struct arguments arguments = {{0}};
+	int rval = 0;
 
 	if ( (env_token = getenv("PUSHOVER_KEY")) != NULL )
 		arguments.key = (char *)env_token;
@@ -98,14 +92,25 @@ int main (int argc, char **argv)
 
 	argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-	pushover_send(
-	        arguments.user,
-	        arguments.key,
-	        arguments.args[0],
-	        arguments.title,
-	        arguments.url,
-	        arguments.verbose
-	);
+	struct PMessage *msg = Pushover_msg_create(
+	                               arguments.user,
+	                               arguments.key,
+	                               arguments.args[0],
+	                               arguments.title,
+	                               arguments.url
+	                       );
 
-	return 0;
+	if (!msg) {
+		log_err("Error creating message.");
+		rval = 1;
+	}
+
+	if (Pushover_msg_send(msg, arguments.verbose) != 0) {
+		log_err("Error sending message.");
+		rval = 1;
+	}
+
+	Pushover_msg_destroy(msg);
+
+	return rval;
 }
