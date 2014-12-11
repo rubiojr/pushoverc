@@ -4,7 +4,7 @@ LDFLAGS=$(shell curl-config --libs)
 SOURCES=$(wildcard src/**/*.c src/*.c)
 OBJECTS=$(patsubst %.c,%.o,$(SOURCES))
 
-TARGET=bin/pushover
+TARGET=bin/pushoverc
 
 # The Target Build
 all: $(TARGET)
